@@ -20,6 +20,7 @@ $ source myvenv/bin/activate
 (myvenv) $ pip install --upgrade pip  
 (myvenv) $ pip install django  
 (myvenv) $ cd mysite  
+(myvenv) $ mkdir pec/kakomon  
 (myvenv) $ python manage.py migrate  
 (myvenv) $ python manage.py shell  
  \>>> import pec.func.install as f  
