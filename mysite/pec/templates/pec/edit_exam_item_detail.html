@@ -1,0 +1,162 @@
+
+<html>
+<head>
+  <title>edit exam item detail</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li class="active"><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <!-- パンくずリスト -->
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:edit' %}">edit</a> &gt; <a href="{% url 'pec:edit_exam_item' %}">edit_exam_item</a> &gt; <a href="{% url 'pec:edit_exam_item_detail' exam_item.id %}">{{exam_item.name_en}}</a>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-8 col-md-12">
+        <div role="main">
+
+          <h1>{{ exam_item.name_jp }}</h1>
+          <h3>{{ exam_item.name_en }}</h3>
+
+          <!-- エラー -->
+          {% if error_messages %}
+          <h2>Info</h2>
+          {% for msg in error_messages %}
+          <p>{{msg}}</p>
+          {% endfor %}
+          <hr>
+          {% endif %}
+
+          <!-- 項目の名前を変更をする時のHTML -->
+          {% if which_form == 'rename_exam_item' %}
+
+          <h2>Renamed</h2>
+          <p>項目の名前が変更されました</p>
+          <p>項目順序　{{previous_exam_item_order}} -> {{exam_item.order}}</p>
+          <p>項目英名　{{previous_exam_item_name_en}} -> {{exam_item.name_en}}</p>
+          <p>項目和名　{{previous_exam_item_name_jp}} -> {{exam_item.name_jp}}</p>
+          <hr>
+          {% endif %}
+
+
+          <h2>Delete</h2>
+          <p>この項目を削除するとともに、この項目の過去問すべてのファイルが削除されます</p>
+          <form id="delete_form" action="" method="post" enctype="multipart/form-data" onsubmit="return confirm_before_delete();">
+            {% csrf_token %}
+            <input class="btn btn-danger" type="submit" value="Delete" name="delete_form_submit_for_exam_item" id="delete_form_submit_for_exam_item">
+          </form>
+          <hr>
+
+          <h2>Rename</h2>
+          <p>この項目の名前が変更されるとともに、この項目の過去問全てのファイルの名前が変更されることがあります</p>
+          <form id="rename_form" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            項目順序　　　：{{ exam_item_rename_form.exam_item_order }}
+            <br>
+            項目英名　　　：{{ exam_item_rename_form.exam_item_name_en }}
+            <br>
+            項目和名　　　：{{ exam_item_rename_form.exam_item_name_jp }}
+            <br>
+            <br>
+            <input class="btn btn-primary" type="submit" value="Rename" name="rename_form_submit_for_exam_item" id="rename_form_submit_for_exam_item" disabled>
+          </form>
+          <hr>
+
+          <hr>
+          <table border="1">
+            <thead><tr>
+              <th>閲覧のみ</th><th>和名ダウンロード</th><th>英名ダウンロード</th><th>拡張子</th><th>サイズ</th><th>最終更新日</th>
+            </tr></thead>
+            <tbody>
+
+
+              {% for file_data in file_datas %}
+              <tr>
+                {% if file_data.extension == '.pdf' %}
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}">閲覧のみ</a></th>
+                {% else %}
+                <th>閲覧不可</th>
+                {% endif %}
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}" download="{{file_data.subject.name_jp}}-{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}">{{file_data.subject.name_jp}}-{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}</a></th>
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}" download="{{file_data.file_name}}">{{file_data.file_name}}</a></th>
+                <th>{{file_data.extension}}</th>
+                <th>{{file_data.size}}</th>
+                <th>{{file_data.reset_day}}</th>
+
+              </tr>
+              {% endfor %}
+
+
+            </tbody>
+          </table>
+
+
+        </div><!-- col -->
+      </div><!-- main -->
+      <div class="complementary">
+        <div class="col-lg-4 col-md-12">
+          {% if exam_item_list %}
+          <h2><a href="{% url 'pec:edit_exam_item' %}">Edit Exam Item</a></h2>
+          <ul>
+            {% for exam_item in exam_item_list %}
+            <li><a href="{% url 'pec:edit_exam_item_detail' exam_item.id %}">{{exam_item.name_jp}}</a></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div><!-- col -->
+      </div><!-- complementary -->
+    </div><!-- row -->
+  </div><!-- container -->
+
+  <script>
+    /* フォームに入力したときに関数を呼び出すために属性を追加 */
+    document.getElementById('id_exam_item_order').setAttribute('onChange', 'check_form_before_rename_exam_item();');
+    document.getElementById('id_exam_item_name_en').setAttribute('onChange', 'check_form_before_rename_exam_item();');
+    document.getElementById('id_exam_item_name_jp').setAttribute('onChange', 'check_form_before_rename_exam_item();');
+
+    function confirm_before_delete(){
+      /*
+      * 削除する前に確認する
+      */
+      var result = window.confirm('本当に削除しても構いませんか？');
+      return result;
+    }
+
+    function check_form_before_rename_exam_item(){
+      /*
+      * 全てのフォームが記入済みであるか確認する
+      * 全てのフォームが記入済みだったらAdd Subjectボタンを押せるようになる
+      */
+      var submitable = true;
+      var form_elements = document.forms['rename_form'].elements;
+
+      if(form_elements['id_exam_item_order'].value == ''){
+        submitable = false;
+      }
+      if(form_elements['id_exam_item_name_en'].value == ''){
+        submitable = false;
+      }
+      if(form_elements['id_exam_item_name_jp'].value == ''){
+        submitable = false;
+      }
+
+      form_elements['rename_form_submit_for_exam_item'].disabled = !(submitable);
+    }
+  </script>
+</body>
+</html>

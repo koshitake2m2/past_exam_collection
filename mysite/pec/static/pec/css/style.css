@@ -1,0 +1,100 @@
+.container {
+    width: 98%;
+}
+
+[role="banner"] {
+    background: #0C4B33;
+    color: #f8f8f8;
+    margin: 0;
+    padding: 0px 10px;
+    width: 100%;
+    float: right;
+}
+[role="banner"] a {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="banner"] a:link {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="banner"] a:hover {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="banner"] a:visited {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="banner"] a:link {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="banner"] {
+    background: #0C4B33;
+    color: #f8f8f8;
+    font-size: 50px;
+}
+
+[role="navigation"] {
+    background: #44B78B;
+    color: #f8f8f8;
+    font-size: 30px;
+    margin: 0;
+    width: 100%;
+    float: right;
+    z-index: 100;
+}
+
+[role="navigation"] {
+    color: #f8f8f8;
+}
+[role="navigation"] a {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="navigation"] a:link {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="navigation"] a:hover {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="navigation"] a:visited {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+[role="navigation"] a:link {
+    text-decoration: none;
+    color: #f8f8f8;
+}
+
+[role="navigation"] li {
+    color: #f8f8f8;
+    margin: 0px 10px;
+    float: left;
+    width: auto;
+    text-align: left;
+    display: inline-block;
+}
+
+[role="navigation"] .active {
+    color:  #ffff00;
+}
+
+[rold="main"] {
+    background: #f8f8f8;
+    color: #0C3C26;
+    line-height: 1.6;
+    font-size: 16px;
+}
+[rold="main"] a {
+    font-size: 20px;
+}
+[role="complementary"] {
+    background: #f8f8f8;
+    color: #0C3C26;
+    line-height: 1.6;
+    font-size: 16px;
+}

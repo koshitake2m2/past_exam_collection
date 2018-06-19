@@ -1,0 +1,119 @@
+<html>
+<head>
+  <title>edit exam item</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li class="active"><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <!-- パンくずリスト -->
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:edit' %}">edit</a> &gt; <a href="{% url 'pec:edit_exam_item' %}">edit_exam_item</a>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-8 col-md-12">
+        <div role="main">
+
+
+          <!-- エラー -->
+          {% if error_messages %}
+          <h2>Info</h2>
+          <p>新しく項目は追加されませんでした</p>
+          {% for msg in error_messages %}
+          <p>{{msg}}</p>
+          {% endfor %}
+          {% endif %}
+
+          <!-- 項目を新しく追加した時のHTML -->
+          {% if which_form == 'add_exam_item' %}
+          <h2>Added</h2>
+          <p>新しく項目を追加しました</p>
+
+          <p>項目番号　{{exam_item.order}}</p>
+          <p>項目英名　{{exam_item.name_en}}</p>
+          <p>項目和名　{{exam_item.name_jp}}</p>
+          <hr>
+          {% endif %}
+
+
+          <h2>Add</h2>
+          <form id="add_form" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            項目番号　　　：{{ exam_item_add_form.exam_item_order }}
+            <br>
+            項目和名　　　：{{ exam_item_add_form.exam_item_name_jp }}
+            <br>
+            項目英名　　　：{{ exam_item_add_form.exam_item_name_en }}
+            <br>
+            <br>
+            <input class="btn btn-primary" type="submit" value="add done" name="add_form_submit_for_exam_item" id="add_form_submit_for_exam_item" disabled>
+          </form>
+          <hr>
+
+          <h2>Exam_item</h2>
+          <table border="1">
+            <tr>
+              <th>順序</th><th>和名</th><th>英名</th><th>編集</th>
+            </tr>
+            {% for exam_item in exam_item_list %}
+            <tr>
+              <td>{{exam_item.order}}</td>
+              <td>{{exam_item.name_jp}}</td>
+              <td>{{exam_item.name_en}}</td>
+              <td><a href="{% url 'pec:edit_exam_item_detail' exam_item.id %}">編集</a></td>
+            </tr>
+
+            {% endfor %}
+          </table>
+
+
+        </div><!-- main -->
+      </div><!-- col -->
+    </div><!-- row -->
+  </div><!-- container -->
+  <script>
+  /* フォームに入力したときに関数を呼び出すために属性を追加 */
+  document.getElementById('id_exam_item_order').setAttribute('onChange', 'check_form_before_add_exam_item();');
+  document.getElementById('id_exam_item_name_en').setAttribute('onChange', 'check_form_before_add_exam_item();');
+  document.getElementById('id_exam_item_name_jp').setAttribute('onChange', 'check_form_before_add_exam_item();');
+
+  function check_form_before_add_exam_item(){
+    /*
+    * 全てのフォームが記入済みであるか確認する
+    * 全てのフォームが記入済みだったらAdd Subjectボタンを押せるようになる
+    */
+    var submitable = true;
+    var form_elements = document.forms['add_form'].elements;
+
+    if(form_elements['id_exam_item_order'].value == ''){
+      submitable = false;
+    }
+    if(form_elements['id_exam_item_name_en'].value == ''){
+      submitable = false;
+    }
+    if(form_elements['id_exam_item_name_jp'].value == ''){
+      submitable = false;
+    }
+
+    form_elements['add_form_submit_for_exam_item'].disabled = !(submitable);
+  }
+
+</script>
+
+</body>
+</html>

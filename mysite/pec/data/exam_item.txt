@@ -1,0 +1,9 @@
+1 mid 中間試験
+2 fin 期末試験
+3 mid+fin 中間＋期末試験
+4 special 特別試験
+5 test 試験
+6 quiz 小テスト
+7 practice 演習問題
+8 problem 課題
+9 lecture 講義資料

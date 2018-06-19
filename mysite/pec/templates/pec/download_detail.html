@@ -1,0 +1,98 @@
+<html>
+<head>
+  <title>download {{ subject.name_en}}</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li class="active"><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <!-- パンくずリスト -->
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:download' %}">download</a> &gt; <a href="{% url 'pec:download_detail' subject.id %}">{{ subject.name_en }}</a>
+
+    <div class="row">
+      <div class="col-lg-8 col-md-12">
+        <div role="main">
+          <h1>{{ subject.name_jp }}</h1>
+          <h3>{{ subject.name_en }}</h3>
+          <br>
+          <hr>
+          <form method="get" action="" name="filter_name">
+            <div>
+              <span style="font-size: 20px;">絞り込み: </span><br>
+              <label><input type="radio" id="filter_all" name="filter_exam_item" value="filter_all" onclick="buttonClick('filter');">全て</input></label>
+              {% for exam_item in exam_item_list %}
+              <label><input type="radio" id="filter_{{exam_item.name_en}}" name="filter_exam_item" value="{{exam_item.name_en}}" onclick="buttonClick('filter');">{{exam_item.name_jp}}</input></label>
+              {% endfor %}
+              <button id="filter">検索</button>
+            </div>
+          </form>
+          <hr>
+
+          <table border="1">
+            <thead><tr>
+              <th>閲覧のみ</th><th>和名ダウンロード</th><th>英名ダウンロード</th><th>拡張子</th><th>サイズ</th><th>最終更新日</th>
+            </tr></thead>
+            <tbody>
+
+
+              {% for file_data in file_datas %}
+              <tr>
+                {% if file_data.extension == '.pdf' %}
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}">閲覧のみ</a></th>
+                {% else %}
+                <th>閲覧不可</th>
+                {% endif %}
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}" download="{{file_data.subject.name_jp}}-{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}">{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}</a></th>
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}" download="{{file_data.file_name}}">{{file_data.year.name_en}}-{{file_data.exam_item.name_en}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^ans," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}</a></th>
+                <th>{{file_data.extension}}</th>
+                <th>{{file_data.size}}</th>
+                <th>{{file_data.reset_day}}</th>
+
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <br>
+
+        </div><!-- main -->
+      </div>
+      <div class="complementary">
+        <div class="col-lg-4 col-md-12">
+          {% if subject_list %}
+          <h2>Download</h2>
+          <ul>
+            {% for subject in subject_list %}
+            <li><a href="{% url 'pec:download_detail' subject.id %}">{{subject.name_jp}}</a></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div><!-- complementary -->
+    </div><!-- row -->
+  </div><!-- container -->
+  <script type="text/javascript" href="{% static 'pec/js/pec-js-func.js' %}"></script>
+  <script>
+  function buttonClick(button_id){
+    /*
+    * 指定のIDをもつボタンをクリックする
+    */
+    document.getElementById(button_id).click();
+  }
+  </script>
+</body>
+<html>

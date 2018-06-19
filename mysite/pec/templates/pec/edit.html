@@ -1,0 +1,43 @@
+<html>
+<head>
+  <title>edit</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li class="active"><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <!-- パンくずリスト -->
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:edit' %}">edit</a>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-8 col-md-12">
+        <div role="main">
+          <h2>編集</h2>
+          <ul>
+            <li><a href="{% url 'pec:edit_subject' %}">授業科目</a></li>
+            <li><a href="{% url 'pec:edit_exam_item' %}">試験項目</a></li>
+            <li><a href="{% url 'pec:edit_file_data' %}">ファイルデータ</a></li>
+          </ul>
+        </div><!-- main -->
+      </div>
+    </div><!-- row -->
+  </div><!-- container -->
+
+</body>
+</html>

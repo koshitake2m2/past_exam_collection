@@ -1,0 +1,144 @@
+<html>
+<head>
+  <title>edit subject</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li class="active"><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <!-- パンくずリスト -->
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:edit' %}">edit</a> &gt; <a href="{% url 'pec:edit_subject' %}">edit_subject</a>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-8 col-md-12">
+        <div role="main">
+          <h1>授業科目 編集</h1>
+          <br>
+
+          <!-- エラー -->
+          {% if error_messages %}
+          <h2>Info</h2>
+          {% for msg in error_messages %}
+          <p>{{msg}}</p>
+          {% endfor %}
+          <hr>
+          {% endif %}
+
+          <!-- 授業の名前を変更をする時のHTML -->
+          {% if which_form == 'add_subject' %}
+          <h2>Added New Subject</h2>
+
+          <p>科目英名　 {{subject.name_en}}</p>
+          <p>科目和名　 {{subject.name_jp}}</p>
+          <p>ふりがな　 {{subject.name_hiragana}}</p>
+          <hr>
+          {% endif %}
+
+          <!-- 授業科目の追加 -->
+          <h2>Add</h2>
+
+          <form id="add_form" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            科目　英名　　：{{ subject_add_form.subject_name_en }}
+            <br>
+            科目　和名　　：{{ subject_add_form.subject_name_jp }}
+            <br>
+            科目　ふりがな：{{ subject_add_form.subject_name_hiragana }}
+            <br>
+            <br>
+            <input class="btn btn-primary" type="submit" value="Add Subject" name="add_form_submit_for_subject" id="add_form_submit_for_subject" disabled>
+          </form>
+
+          <hr>
+
+          <!-- 絞り込み検索 -->
+          <form method="get" action="" name="filter_name">
+            <div>
+              <span style="font-size: 20px;">絞り込み: </span><br>
+              <label><input type="radio" name="filter_subject" id="search_existing_subject" value="exists" onclick="buttonClick('filter');">過去問がある科目</input></label>
+              <label><input type="radio" name="filter_subject" id="search_no_existing_subject" value="no_exists" onclick="buttonClick('filter');">過去問がない科目</input></label>
+              <label><input type="radio" name="filter_subject" id="search_all_subject" value="all_subject" onclick="buttonClick('filter');">全科目</input></label>
+              <button id="filter">検索</button>
+            </div>
+          </form>
+          <hr>
+
+          {% if subject_list %}
+
+          <h2>Subject</h2>
+          <table border="1">
+            <tr>
+              <td>和名</td><td>英名</td>
+            </tr>
+            {% for subject in subject_list %}
+            <tr>
+              <th><a href="{% url 'pec:edit_subject_detail' subject.id %}">{{subject.name_jp}}</a></th>
+              <th>{{subject.name_en}}</th>
+            </tr>
+
+            {% endfor %}
+          </table>
+
+
+          {% else %}
+          <p>PECはただいま利用できません</p>
+          {% endif %}
+        </div><!-- main -->
+      </div>
+    </div><!-- row -->
+  </div><!-- container -->
+
+  <script>
+  /* フォームに入力したときに関数を呼び出すために属性を追加 */
+  document.getElementById('id_subject_name_en').setAttribute('onChange', 'check_form_before_add_subject();');
+  document.getElementById('id_subject_name_jp').setAttribute('onChange', 'check_form_before_add_subject();');
+  document.getElementById('id_subject_name_hiragana').setAttribute('onChange', 'check_form_before_add_subject();');
+
+  function buttonClick(button_id){
+    /*
+    * 指定のIDをもつボタンをクリックする
+    */
+    document.getElementById(button_id).click();
+  }
+
+  function check_form_before_add_subject(){
+    /*
+    * 全てのフォームが記入済みであるか確認する
+    * 全てのフォームが記入済みだったらAdd Subjectボタンを押せるようになる
+    */
+    var submitable = true;
+    var form_elements = document.forms['add_form'].elements;
+
+    if(form_elements['id_subject_name_en'].value == ''){
+      submitable = false;
+    }
+    if(form_elements['id_subject_name_jp'].value == ''){
+      submitable = false;
+    }
+    if(form_elements['id_subject_name_hiragana'].value == ''){
+      submitable = false;
+    }
+
+    form_elements['add_form_submit_for_subject'].disabled = !(submitable);
+  }
+
+  </script>
+
+</body>
+</html>

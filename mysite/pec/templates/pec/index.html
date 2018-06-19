@@ -1,0 +1,91 @@
+
+
+<html>
+<head>
+  <title>pec</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <hr>
+    <div class="row">
+      <div class="main">
+        <div class="col-sm-9 col-xs-12">
+          <br>
+          <ul style="font-size: 30px;">
+            <li><a href="{% url 'pec:download' %}">ダウンロードページへ</a></li>
+            <li><a href="{% url 'pec:upload' %}">アップロードページへ</a></li>
+            <li><a href="{% url 'pec:edit' %}">編集ページへ</a></li>
+          </ul>
+          <hr>
+
+          <h1>利用規約 <span style="font-size: 20px; color: #ff0000">(必ずお読みください！！！)</span></h1>
+
+          <h3>当サイトについて</h3>
+          <div>　当サイトは試験問題や講義資料をまとめて管理できるものが欲しいと考えて作成されました。もちろん資料は著作物のため、パブリックに公開することはありません。むしろ自分のパソコン内、すなわちローカル環境で利用することを想定しております。
+            <br>
+            　このサイトの特徴はアップロードされたファイルが厳格な命名規則のもとに名前変更され、管理されることです。例えば、授業や先生によって、ファイルの名前の付け方はバラバラです。また、必ずしもファイルに授業科目や年度を入れるとは限りません。しかし、このサイトを通してアップロードされたファイルは全て同じフォーマットで名前が変更されます。これにより、ファイル名だけで簡単に内容物がわかるようなります。
+            <br>
+            　また、アップロードされたファイルは科目ごとに用意されたダウンロードページからダウンロードすることができます。年度や項目によって整理されているので探したいファイルをすぐに見つけられます。
+            <br>
+            　さらに、間違ってアップロードされたファイルは編集することができます。名前を変更したり、削除したりすることができます。それはファイルだけでなく、授業科目や項目についてもできることです。
+            <br>
+            　このサイトはファイル（特に試験問題や講義資料）を管理するのに特化してます。編集で授業科目や項目は変更することができるのでお好みの名前をつけることも可能です。ぜひご利用いたただければと思います。
+          </div>
+
+          <h3>ご利用方法</h3>
+          <div>当サイトでは「過去問をダウンロードするページ」と「過去問をアップロードするページ」と「過去問を編集するページ」があり、それぞれご利用いただけます。
+          </div>
+
+          <h3>個人情報の取り扱い</h3>
+          <div>当サイトに提供された過去問等に個人の名前や成績が含まれている可能性がありますが、それに伴う個人情報の保護は一切しませんのでご了承ください。しかし、万が一不適切な資料が掲載されていた場合は管理者が判断した上、削除いたしますのでご報告ください。
+          </div>
+
+          <h3>著作権について</h3>
+          <div>当サイトで扱う過去問の多くは先生方の著作物です。取り扱いには慎重になりましょう。また、過去問の掲載については先生方に許可を得てはいないため、先生方にご指摘があった場合はこのサイトは閉鎖される可能性があります。（先生方ご自身で過去問を公開してくださる方もいらっしゃいますね！）
+          </div>
+
+          <h3>ライセンス</h3>
+          <div>Copyright (c) 2018 Takeru Koshimizu<br>
+            Released under the MIT license<br>
+            <a href="https://opensource.org/licenses/mit-license.php">https://opensource.org/licenses/mit-license.php</a>
+          </div>
+
+          <h3>免責事項</h3>
+          <div>当サイトを利用したせいで利用者に不利益が生じたとしても管理者は一切の責任は負い兼ねますことをご承知おきください。
+          </div>
+
+          <h3>お問い合わせ</h3>
+          <div>お問い合わせは管理者によろしくお願いします。連絡方法は
+            <br>
+            <a href="https://github.com/koshitake2m2">https://github.com/koshitake2m2</a><br><a href="https://twitter.com/koshitake2m2">https://twitter.com/koshitake2m2</a><br>でお願いします。
+          </div>
+
+
+        </div>
+      </div><!-- main -->
+      <div class="complementary">
+        <div class="col-sm-3">
+        </div>
+      </div> <!-- complementary -->
+    </div> <!-- end row -->
+  </div><!-- container -->
+</body>
+</html>

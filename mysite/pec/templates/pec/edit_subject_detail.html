@@ -1,0 +1,176 @@
+<html>
+<head>
+  <title>edit subject detail</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li class="active"><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <!-- パンくずリスト -->
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:edit' %}">edit</a> &gt; <a href="{% url 'pec:edit_subject' %}">edit_subject</a> &gt; <a href="{% url 'pec:edit_subject_detail' subject.id %}">{{subject.name_en}}</a>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-8 col-md-12">
+        <div role="main">
+
+          <h1>{{ subject.name_jp }}</h1>
+          <h3>{{ subject.name_en }}</h3>
+          <br>
+
+          <!-- エラー -->
+          {% if error_messages %}
+          <h2>Info</h2>
+          {% for msg in error_messages %}
+          <p>{{msg}}</p>
+          {% endfor %}
+          {% endif %}
+
+          <!-- 授業の名前を変更をする時のHTML -->
+          {% if which_form == 'rename_subject' %}
+          <h2>Renamed</h2>
+          <p>名前を変更しました</p>
+
+          <p>科目英名　{{previous_subject_name_en}} -> {{subject.name_en}}</p>
+          <p>科目和名　{{previous_subject_name_jp}} -> {{subject.name_jp}}</p>
+          <p>ふりがな　{{previous_subject_name_hiragana}} -> {{subject.name_hiragana}}</p>
+          <p><a href="{% url 'pec:edit_subject' %}">edit subject へ戻る</a></p>
+          <p><a href="{% url 'pec:download_detail' subject.id %}">この科目の download へ進む</a></p>
+          {% endif %}
+
+          <!-- 授業のファイルを削除する時のHTML -->
+          <h2>Delete</h2>
+          <p>この科目を削除するとともに、この科目の過去問すべてのファイルが削除されます</p>
+          <form id="delete_form" action="" method="post" enctype="multipart/form-data" onsubmit="return confirm_before_delete();">
+            {% csrf_token %}
+            <input class="btn btn-danger" type="submit" value="Delete" name="delete_form_submit_for_subject" id="delete_form_submit_for_subject">
+          </form>
+          <hr>
+
+          <!-- 授業の名前を変更をする時のHTML -->
+          <h2>Rename</h2>
+          <p>この科目の名前が変更されるとともに、この科目の過去問全てのファイルの名前が変更されることがあります</p>
+          <form id="rename_form" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            科目　英名　　：{{ subject_rename_form.subject_name_en }}
+            <br>
+            科目　和名　　：{{ subject_rename_form.subject_name_jp }}
+            <br>
+            科目　ふりがな：{{ subject_rename_form.subject_name_hiragana }}
+            <br>
+            <br>
+            <input class="btn btn-primary" type="submit" value="Rename" name="rename_form_submit_for_subject" id="rename_form_submit_for_subject">
+          </form>
+
+          <hr>
+          <form method="get" action="" name="filter_name">
+            <div>
+              <span style="font-size: 20px;">絞り込み: </span><br>
+              {% for exam_item in exam_item_list %}
+              <label><input type="radio" id="filter_exam_item" name="exam_item" value="{{exam_item.name_en}}" onclick="buttonClick('filter')">{{exam_item.name_jp}}</input></label>
+              {% endfor %}
+              <button id="filter">検索</button>
+            </div>
+          </form>
+          <hr>
+
+          <table border="1">
+            <thead><tr>
+              <th>閲覧のみ</th><th>ファイル編集へ</th><th>ファイル編集へ</th><th>拡張子</th><th>サイズ</th><th>最終更新日</th>
+            </tr></thead>
+            <tbody>
+
+
+              {% for file_data in file_datas %}
+              <tr>
+                {% if file_data.extension == '.pdf' %}
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}">閲覧のみ</a></th>
+                {% else %}
+                <th>閲覧不可</th>
+                {% endif %}
+                <th><a href="{% url 'pec:edit_file_data_detail' file_data.id %}">{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}</a></th>
+                <th><a href="{% url 'pec:edit_file_data_detail' file_data.id %}">{{file_data.year.name_en}}-{{file_data.exam_item.name_en}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^ans," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}</a></th>
+                <th>{{file_data.extension}}</th>
+                <th>{{file_data.size}}</th>
+                <th>{{file_data.reset_day}}</th>
+
+              </tr>
+              {% endfor %}
+            </tbody></table>
+
+          </div><!-- col -->
+        </div><!-- main -->
+        <div class="complementary">
+          <div class="col-lg-4 col-md-12">
+            {% if subject_list %}
+            <h2><a href="{% url 'pec:edit_subject' %}">Edit Subject</a></h2>
+            <ul>
+              {% for subject in subject_list %}
+              <li><a href="{% url 'pec:edit_subject_detail' subject.id %}">{{subject.name_jp}}</a></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div><!-- col -->
+        </div><!-- complementary -->
+      </div><!-- row -->
+    </div><!-- container -->
+
+    <script>
+    /* フォームに入力したときに関数を呼び出すために属性を追加 */
+    document.getElementById('id_subject_name_en').setAttribute('onChange', 'check_form_before_rename_subject();');
+    document.getElementById('id_subject_name_jp').setAttribute('onChange', 'check_form_before_rename_subject();');
+    document.getElementById('id_subject_name_hiragana').setAttribute('onChange', 'check_form_before_rename_subject();');
+
+    function buttonClick(button_id){
+      /*
+      * 指定のIDをもつボタンをクリックする
+      */
+      document.getElementById(button_id).click();
+    }
+
+    function confirm_before_delete(){
+      /*
+      * 削除する前に確認する
+      */
+      var result = window.confirm('本当に削除しても構いませんか？');
+      return result;
+    }
+
+    function check_form_before_rename_subject(){
+      /*
+      * 全てのフォームが記入済みであるか確認する
+      * 全てのフォームが記入済みだったらAdd Subjectボタンを押せるようになる
+      */
+      var submitable = true;
+      var form_elements = document.forms['rename_form'].elements;
+
+      if(form_elements['id_subject_name_en'].value == ''){
+        submitable = false;
+      }
+      if(form_elements['id_subject_name_jp'].value == ''){
+        submitable = false;
+      }
+      if(form_elements['id_subject_name_hiragana'].value == ''){
+        submitable = false;
+      }
+
+      form_elements['rename_form_submit_for_subject'].disabled = !(submitable);
+    }
+  </script>
+</body>
+</html>

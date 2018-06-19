@@ -1,0 +1,257 @@
+<html>
+<head>
+  <title>edit_file_data_detail</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li class="active"><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+
+    <!-- パンくずリスト -->
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:edit' %}">edit</a> &gt; <a href="{% url 'pec:edit_file_data' %}">edit_file_data</a> &gt; <a href="{% url 'pec:edit_file_data_detail' file_data.id %}">{{file_data.file_name}}</a>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-8 col-md-12">
+        <div role="main">
+          <h1>{{file_data.subject.name_jp}}-{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}{{file_data.extension}}</h1>
+          <h3>{{file_data.file_name}}</h3>
+          <br>
+
+          <table border="1">
+            <thead><tr>
+              <th>閲覧のみ</th><th>和名ダウンロード</th><th>英名ダウンロード</th><th>拡張子</th><th>サイズ</th><th>最終更新日</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                {% if file_data.extension == '.pdf' %}
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}">閲覧のみ</a></th>
+                {% else %}
+                <th>閲覧不可</th>
+                {% endif %}
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}" download="{{file_data.subject.name_jp}}-{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}">{{file_data.year.name_jp}}-{{file_data.exam_item.name_jp}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^解答," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}</a></th>
+                <th><a href="/pec/kakomon/{{file_data.subject.name_en}}/{{file_data.file_name}}" download="{{file_data.file_name}}">{{file_data.year.name_en}}-{{file_data.exam_item.name_en}}{% if file_data.exam_item_number != 0 %}{{file_data.exam_item_number}}{% endif %}{{ file_data.only_ans|yesno:"^ans," }}{% if file_data.same_name_number != 0 %}({{file_data.same_name_number}}){% endif %}</a></th>
+                <th>{{file_data.extension}}</th>
+                <th>{{file_data.size}}</th>
+                <th>{{file_data.reset_day}}</th>
+
+              </tr>
+            </tbody>
+          </table>
+
+          {% if error_messages %}
+          <h2> Info </h2>
+          {% for error_message in error_messages %}
+          <div>{{error_message}}</div>
+          {% endfor %}
+          <hr>
+          {% endif %}
+
+          <!-- ファイルを削除するフォーム -->
+          <h2>Delete</h2>
+          <p>一度削除すると復元できません</p>
+          <form id="delete_form" action="" method="post" enctype="multipart/form-data" onsubmit="return confirm_before_delete();">
+            {% csrf_token %}
+            <input class="btn btn-danger" type="submit" value="Delete" name="delete_form_submit_for_file_data" id="delete_form_submit_for_file_data">
+          </form>
+          <hr>
+
+          <!-- ファイルの名前を変更するフォーム -->
+          {% if file_renamed %}
+          <h2> Info </h2>
+          <div>{{previous_file_data.file_name}}の名前が変更されて、
+            <br>{{file_name}}として保存しました。
+            <br><a href="{% url 'pec:download_detail' subject.id %}">ダウンロードページへ</a>
+          </div>
+          <hr>
+          {% endif %}
+
+          <h2>Rename</h2>
+          <form id="rename_form" action="{% url 'pec:edit_file_data_detail' file_data.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- 科目選択 -->
+            <div><span style="font-size: 20px;">1. </span>科目選択</div>
+            <select id="subject" name="subject" onChange="add_selectable_new_subject(); check_form_before_rename()">
+              <option value="no_select">選択してください</option>
+              <option value="{{previous_file_data.subject.name_en}}" selected>{{previous_file_data.subject.name_jp}}</option>
+              {% for subject in existing_subject_list %}
+              <option value="{{subject.name_en}}">{{subject.name_jp}}</option>
+              {% endfor %}
+              <option value="new_subject">新しく追加</option>
+            </select>
+            <br>
+
+            <div id="selectable_new_subject">
+            </div>
+            <div id="info_new_subject">
+            </div>
+
+            <hr>
+            <!-- 年度選択 -->
+            <div><span style="font-size: 20px;">2. </span>年度選択</div>
+            <select id="year" name="year" onChange="check_new_year()">
+              <option value="{{previous_file_data.year.name_en}}" selected>{{previous_file_data.year.name_en}}, {{previous_file_data.year.name_jp}}</option>
+              {% for year in year_list %}
+              <option value="{{year.name_en}}">{{year.name_en}}, {{year.name_jp}}</option>
+              {% endfor %}
+            </select>
+
+            <hr>
+            <!-- 項目選択 -->
+            <div><span style="font-size: 20px;">3. </span>項目選択 [+番号]</div>
+            <select id="exam_item" name="exam_item" onChange="check_form_before_rename()">
+              <option value="no_select">選択してください</option>
+              <option value="{{previous_file_data.exam_item.name_en}}" selected>{{previous_file_data.exam_item.name_jp}}</option>
+              {% for exam_item in exam_item_list %}
+              <option value="{{exam_item.name_en}}">{{exam_item.name_jp}}</option>
+              {% endfor %}
+            </select>
+
+            <!-- 項目番号選択 -->
+            <select id="exam_item_number" name="exam_item_number">
+
+              {% if previous_file_data.exam_item_number == 0 %}
+              <option value="0" selected>指定なし</option>
+              {% else %}
+              <option value="{{previous_file_data.exam_item_number}}">{{previous_file_data.exam_item_number}}</option>
+              {% endif %}
+
+              {% for num in exam_item_number %}
+              {% if forloop.first %}
+              <option value="0">指定なし</option>
+              {% else %}
+              <option value="{{num}}">{{num}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+            <hr>
+
+            <!-- 解答選択 -->
+            <div><span style="font-size: 20px;">4. </span>解答選択</div>
+            {% if previous_file_data.only_ans %}
+            <input type="radio" name="answer" id="notonlyans" value="notonlyans" onclick="">
+            <label style="width: 200px;" for="notonlyans">問題のみ or 問題＋解答</label>
+            <br>
+            <input type="radio" name="answer" id="onlyans" value="onlyans" onclick="" checked>
+            <label style="width: 200px;" for="onlyans">解答のみ</label>
+            {% else %}
+            <input type="radio" name="answer" id="notonlyans" value="notonlyans" onclick="" checked>
+            <label style="width: 200px;" for="notonlyans">問題のみ or 問題＋解答</label>
+            <br>
+            <input type="radio" name="answer" id="onlyans" value="onlyans" onclick="">
+            <label style="width: 200px;" for="onlyans">解答のみ</label>
+            {% endif %}
+
+            <hr>
+
+            <!-- 拡張子 -->
+            <div><span style="font-size: 20px;">5. </span>拡張子変更</div>
+            <br>
+            <select id="extension" name="extension">
+              <option value="{{previous_file_data.extension}}" selected>{{previous_file_data.extension}}</option>
+              <option value=".pdf">.pdf</option>
+              <option value=".tar">.tar</option>
+            </select>
+            <hr>
+
+            <!-- アップロード -->
+            <div><span style="font-size: 20px;">6. </span>名前変更</div>
+            <br>
+            <input class="btn btn-primary" type="submit" value="Rename file" name="rename_form_submit_for_file_data" id="rename_form_submit_for_file_data">
+            <div>全てのフォームが入力されていることを<br>確認してアップロードしてください</div>
+
+          </form>
+
+        </div><!-- main -->
+      </div><!-- col -->
+      <div class="complementary">
+        <div class="col-lg-4 col-md-12">
+          {% if subject_list %}
+          <h2><a href="{% url 'pec:edit_subject' %}">Edit Subject</a></h2>
+          <ul>
+            {% for subject in subject_list %}
+            <li><a href="{% url 'pec:edit_subject_detail' subject.id %}">{{subject.name_jp}}</a></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div><!-- col -->
+      </div><!-- complementary -->
+    </div><!-- row -->
+  </div><!-- container -->
+  <script>
+
+  function confirm_before_delete(){
+    /*
+    * 削除する前に確認する
+    */
+    var result = window.confirm('本当に削除しても構いませんか？');
+    return result;
+  }
+
+  function check_form_before_rename_file_data(){
+    /*
+    * 全てのフォームが記入済みであるか確認する
+    * 全てのフォームが記入済みだったらAdd Subjectボタンを押せるようになる
+    */
+    var submitable = true;
+    var form_elements = document.forms['rename_form'].elements;
+
+    if (form_elements['subject'].value == 'no_select') {
+      submitable = false;
+    } else {
+      if (form_elements['subject'].value == 'new_subject' && form_elements['new_subject'].value == 'no_select'){
+        submitable = false;
+      }
+    }
+    if (form_elements['exam_item'].value == 'no_select') {
+      submitable = false;
+    }
+
+    form_elements['rename_form_submit_for_file_data'].disabled = !(submitable);
+  }
+  function add_selectable_new_subject(){
+    /*
+    * 科目フォームで新しく追加を選択したとき、まだ過去問がない科目を
+    * 選択できるフォームが出現する
+    */
+    if(document.forms['rename_form'].elements['subject'].value == 'new_subject'){
+      var info_new_subject = document.getElementById('info_new_subject');
+      info_new_subject.innerHTML = '(科目選択で「新しく追加」を選択してください)';
+
+      var selectable_new_subject = document.getElementById('selectable_new_subject');
+      var select = document.createElement('select');
+      select.setAttribute('id', 'new_subject');
+      select.setAttribute('name', 'new_subject');
+      select.setAttribute('onChange', 'check_form_before_upload();');
+      var option = document.createElement('option');
+      option.setAttribute('value', 'no_select');
+      option.innerHTML = 'さらに選択してください';
+      select.appendChild(option);
+
+      {% for subject in new_subject_list %}
+      option = document.createElement('option');
+      option.setAttribute('value', '{{subject.name_en}}');
+      option.innerHTML = '{{subject.name_jp}}';
+      select.appendChild(option);
+      {% endfor %}
+      selectable_new_subject.appendChild(select);
+    }
+  }
+  </script>
+</body>
+</html>

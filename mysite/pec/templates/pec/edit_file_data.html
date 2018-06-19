@@ -1,0 +1,41 @@
+<html>
+<head>
+  <title>edit_file_data</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'pec/css/style.css' %}" />
+</head>
+<body>
+  <div class="container">
+    <div role="banner">
+      <div style="text-align: left;">
+        <a class="logo" href="{% url 'pec:index' %}">Past Exam Collection</a>
+      </div>
+    </div>
+
+    <div role="navigation">
+      <ul>
+        <li class="active"><a href="{% url 'pec:download' %}">downlaod</a></li>
+        <li><a href="{% url 'pec:upload' %}">upload</a></li>
+        <li><a href="{% url 'pec:edit' %}">edit</a></li>
+      </ul>
+    </div>
+    <a href="{% url 'pec:index' %}">pec</a> &gt; <a href="{% url 'pec:edit' %}">edit</a> &gt; <a href="{% url 'pec:edit_file_data' %}">edit_file_data</a>
+    {% if file_datas %}
+    <hr>
+    <div class="main">
+      <h2>Edit File Data</h2>
+      <ul>
+        {% for file_data in file_datas %}
+        <li><a href="{% url 'pec:edit_file_data_detail' file_data.id %}">{{file_data.file_name}}</a></li>
+        {% endfor %}
+      </ul>
+    </div><!-- main  -->
+  </div><!-- container -->
+
+  {% else %}
+  <p>PECはただいま利用できません</p>
+  {% endif %}
+
+</body>
+</html>
